@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 
@@ -10,7 +10,7 @@ app.get("/", (req, res) => {
   res.send("Flight Offer Scraper running!");
 });
 
-  const PORT = process.env.PORT || 3000;
+  
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
