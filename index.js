@@ -7,32 +7,51 @@ app.use(cors());
 
 const PORT = process.env.PORT || 3000;
 
-// Root test route
+// Test route
 app.get("/", (req, res) => {
   res.send("Flight Offer Scraper API is running!");
 });
 
-// ✅ Final Skyscanner route (dynamic)
+// Skyscanner v2 route
 app.get("/skyscanner", async (req, res) => {
-  const { origin, destination, date } = req.query;
+  const {
+    originSkyId,
+    destinationSkyId,
+    originEntityId,
+    destinationEntityId,
+    date,
+  } = req.query;
 
-  if (!origin || !destination || !date) {
-    return res
-      .status(400)
-      .json({ error: "Missing origin, destination, or date" });
+  // Validate required query parameters
+  if (
+    !originSkyId ||
+    !destinationSkyId ||
+    !originEntityId ||
+    !destinationEntityId ||
+    !date
+  ) {
+    return res.status(400).json({
+      error:
+        "Missing required parameters: originSkyId, destinationSkyId, originEntityId, destinationEntityId, and date",
+    });
   }
 
   const options = {
     method: "GET",
-    url: "https://sky-scrapper.p.rapidapi.com/api/v1/flights/getFlightDetails",
+    url: "https://sky-scrapper.p.rapidapi.com/api/v2/flights/searchFlights",
     params: {
-      legs: `[{"destination":"${destination}","origin":"${origin}","date":"${date}"}]`,
+      originSkyId,
+      destinationSkyId,
+      originEntityId,
+      destinationEntityId,
+      date,
       adults: "1",
-      currency: "USD",
-      locale: "en-US",
-      market: "en-US",
+      market: "IN",
+      countryCode: "IN",
+      currency: "INR",
+      locale: "en-IN",
       cabinClass: "economy",
-      countryCode: "US",
+      sortBy: "best",
     },
     headers: {
       "x-rapidapi-host": "sky-scrapper.p.rapidapi.com",
@@ -44,12 +63,10 @@ app.get("/skyscanner", async (req, res) => {
     const response = await axios.request(options);
     res.json(response.data);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        error: "Failed to fetch Skyscanner data",
-        details: error.message,
-      });
+    res.status(500).json({
+      error: "Failed to fetch Skyscanner data",
+      details: error.message,
+    });
   }
 });
 
