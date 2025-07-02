@@ -42,3 +42,26 @@ app.get("/skyscanner", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+// ------------------
+// ✈️ Skyscanner Flights from AirScraper
+// ------------------
+
+app.get("/skyscanner", async (req, res) => {
+  const axios = require("axios");
+  const apiKey = "c20c8406fdmsh6b8b35e214af438p1c3ab4jsn15ca574a21c5
+"; // Replace with your real key
+
+  try {
+    const response = await axios.get("https://airscraper.data-hub.online/api/skyscanner", {
+      headers: {
+        "X-API-KEY": apiKey
+      }
+    });
+
+    res.json(response.data);
+  } catch (error) {
+    console.error("Skyscanner error:", error.message);
+    res.status(500).json({ error: "Skyscanner API call failed" });
+  }
+});
