@@ -1,37 +1,44 @@
 const express = require("express");
 const cors = require("cors");
+const axios = require("axios");
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 
-// Dummy route to test server
+// Default test endpoint
 app.get("/", (req, res) => {
   res.send("Flight Offer Scraper running!");
 });
 
-  
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
-
-const apiKey = "67113801348c8c920f1abc4486844553";
-const axios = require("axios");
-
-app.get("/scrape", async (req, res) => {
-  const apiKey = "67113801348c8c920f1abc4486844553"; // Replace with your actual key
-  const targetURL = "https://httpbin.org/ip"; // Dummy test URL
-
+// NEW: Skyscanner flight data endpoint
+app.get("/skyscanner", async (req, res) => {
   try {
-    const response = await axios.get(`http://api.scraperapi.com`, {
+    const response = await axios.get('https://sky-scrapper.p.rapidapi.com/api/v1/flights/getFlightDetails', {
+      headers: {
+        'X-RapidAPI-Key': 'c20c8406fdmsh6b8b35e214af438p1c3ab4jsn15ca574a21c5',
+        'X-RapidAPI-Host': 'sky-scrapper.p.rapidapi.com'
+      },
       params: {
-        api_key: apiKey,
-        url: targetURL
+        legs: 'SFO%7B%7Ddestination%3A%2FLON%7Corigin%3A%2FLAX', // dummy data for now
+        date: '2024-08-11',
+        adults: '1',
+        currency: 'USD',
+        locale: 'en-US',
+        market: 'en-US',
+        cabinClass: 'economy',
+        countryCode: 'US'
       }
     });
 
     res.json(response.data);
   } catch (error) {
-    res.status(500).json({ error: "Scraping failed", details: error.message });
+    res.status(500).json({ error: "Skyscanner API failed", details: error.message });
   }
+});
+
+// Server listening
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
