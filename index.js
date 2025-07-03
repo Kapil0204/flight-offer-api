@@ -66,3 +66,49 @@ app.get("/skyscanner", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+const Amadeus = require('amadeus');
+
+const amadeus = new Amadeus({
+  clientId: process.env.AMADEUS_API_KEY,
+  clientSecret: process.env.AMADEUS_API_SECRET,
+});
+
+// Test route to get flight offers
+app.get("/amadeus", async (req, res) => {
+  try {
+    const response = await amadeus.shopping.flightOffersSearch.get({
+      originLocationCode: 'DEL',
+      destinationLocationCode: 'BOM',
+      departureDate: '2025-07-10',
+      adults: '1'
+    });
+
+    res.json(response.data);
+  } catch (error) {
+    console.error("Amadeus API Error:", error);
+    res.status(500).json({ error: "Failed to fetch Amadeus data" });
+  }
+});
+const Amadeus = require('amadeus');
+
+const amadeus = new Amadeus({
+  clientId: process.env.AMADEUS_API_KEY,
+  clientSecret: process.env.AMADEUS_API_SECRET,
+});
+
+// Test route to get flight offers
+app.get("/amadeus", async (req, res) => {
+  try {
+    const response = await amadeus.shopping.flightOffersSearch.get({
+      originLocationCode: 'DEL',
+      destinationLocationCode: 'BOM',
+      departureDate: '2025-07-10',
+      adults: '1'
+    });
+
+    res.json(response.data);
+  } catch (error) {
+    console.error("Amadeus API Error:", error);
+    res.status(500).json({ error: "Failed to fetch Amadeus data" });
+  }
+});
