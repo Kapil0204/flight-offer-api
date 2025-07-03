@@ -8,6 +8,13 @@ const app = express();
 app.use(cors());
 
 const PORT = process.env.PORT || 3000;
+// Test route to check if environment variables are working
+app.get("/env-test", (req, res) => {
+  res.json({
+    key: process.env.AMADEUS_API_KEY || "missing key",
+    secret: process.env.AMADEUS_API_SECRET || "missing secret",
+  });
+});
 
 // Check if env variables are loading correctly (optional)
 app.get("/env-test", (req, res) => {
@@ -32,10 +39,10 @@ app.get("/", (req, res) => {
 app.get("/amadeus", async (req, res) => {
   try {
     const response = await amadeus.shopping.flightOffersSearch.get({
-      originLocationCode: 'DEL',
-      destinationLocationCode: 'BOM',
-      departureDate: '2025-07-10',
-      adults: '1'
+      originLocationCode: "DEL",
+      destinationLocationCode: "BOM",
+      departureDate: "2025-07-10",
+      adults: "1",
     });
 
     res.json(response.data);
