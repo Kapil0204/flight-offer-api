@@ -1,40 +1,25 @@
+// index.js
 const express = require("express");
-const cors = require("cors");
 const axios = require("axios");
+const cors = require("cors");
 
 const app = express();
 app.use(cors());
 
 const PORT = process.env.PORT || 3000;
 
-// Test route
 app.get("/", (req, res) => {
-  res.send("Flight Offer Scraper API is running!");
+  res.send("Flight Offer API is live");
 });
 
-// Skyscanner v2 route
 app.get("/skyscanner", async (req, res) => {
   const {
-    originSkyId,
-    destinationSkyId,
-    originEntityId,
-    destinationEntityId,
-    date,
+    originSkyId = "JFK",
+    destinationSkyId = "LAX",
+    originEntityId = "27539757",
+    destinationEntityId = "27539626",
+    date = "2025-03-07",
   } = req.query;
-
-  // Validate required query parameters
-  if (
-    !originSkyId ||
-    !destinationSkyId ||
-    !originEntityId ||
-    !destinationEntityId ||
-    !date
-  ) {
-    return res.status(400).json({
-      error:
-        "Missing required parameters: originSkyId, destinationSkyId, originEntityId, destinationEntityId, and date",
-    });
-  }
 
   const options = {
     method: "GET",
@@ -45,12 +30,11 @@ app.get("/skyscanner", async (req, res) => {
       originEntityId,
       destinationEntityId,
       date,
-      adults: "1",
-      market: "IN",
-      countryCode: "IN",
-      currency: "INR",
-      locale: "en-IN",
+      currency: "USD",
+      market: "US",
+      countryCode: "US",
       cabinClass: "economy",
+      adults: "1",
       sortBy: "best",
     },
     headers: {
@@ -60,16 +44,25 @@ app.get("/skyscanner", async (req, res) => {
   };
 
   try {
+    console.log("Request options:", options); // Log what you're sending
+
     const response = await axios.request(options);
+
+    console.log("API Response:", response.data); // Log the full response
+
     res.json(response.data);
   } catch (error) {
+    console.error("API error:", error.response?.data || error.message); // Log error details
+
     res.status(500).json({
-      error: "Failed to fetch Skyscanner data",
-      details: error.message,
+      status: false,
+      message: "Backend error: could not fetch flight info",
+      details: error.response?.data || error.message,
     });
   }
+
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
