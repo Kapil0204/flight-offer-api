@@ -8,7 +8,8 @@ const app = express();
 app.use(cors());
 
 const PORT = process.env.PORT || 3000;
-// Test route to check if environment variables are working
+
+// ✅ Test route to check if environment variables are working
 app.get("/env-test", (req, res) => {
   res.json({
     key: process.env.AMADEUS_API_KEY || "missing key",
@@ -16,26 +17,18 @@ app.get("/env-test", (req, res) => {
   });
 });
 
-// Check if env variables are loading correctly (optional)
-app.get("/env-test", (req, res) => {
-  res.json({
-    key: process.env.AMADEUS_API_KEY,
-    secret: process.env.AMADEUS_API_SECRET,
-  });
-});
-
-// Initialize Amadeus client
+// ✅ Initialize Amadeus client
 const amadeus = new Amadeus({
   clientId: process.env.AMADEUS_API_KEY,
   clientSecret: process.env.AMADEUS_API_SECRET,
 });
 
-// Base route
+// ✅ Base route
 app.get("/", (req, res) => {
   res.send("Flight Offer API is live");
 });
 
-// Test Amadeus route
+// ✅ Test Amadeus flight search route
 app.get("/amadeus", async (req, res) => {
   try {
     const response = await amadeus.shopping.flightOffersSearch.get({
@@ -47,7 +40,7 @@ app.get("/amadeus", async (req, res) => {
 
     res.json(response.data);
   } catch (error) {
-    console.error("Amadeus API Error:", error);
+    console.error("Amadeus API Error:", error.response?.data || error.message);
     res.status(500).json({ error: "Failed to fetch Amadeus data" });
   }
 });
