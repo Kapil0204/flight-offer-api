@@ -36,6 +36,7 @@ app.get("/amadeus", async (req, res) => {
       destinationLocationCode: "BOM",
       departureDate: "2025-07-10",
       adults: "1",
+      currencyCode: "INR",
     });
 
     res.json(response.data);
