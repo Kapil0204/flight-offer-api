@@ -9,63 +9,26 @@ app.use(cors());
 
 const PORT = process.env.PORT || 3000;
 
-// Base route to check if API is running
-app.get("/", (req, res) => {
-  res.send("Flight Offer API is live");
+// Check if env variables are loading correctly (optional)
+app.get("/env-test", (req, res) => {
+  res.json({
+    key: process.env.AMADEUS_API_KEY,
+    secret: process.env.AMADEUS_API_SECRET,
+  });
 });
 
-/* ----- DISABLED: Skyscanner (AirScraper) - Limit exhausted -----
-app.get("/skyscanner", async (req, res) => {
-  const {
-    originSkyId = "JFK",
-    destinationSkyId = "LAX",
-    originEntityId = "27539757",
-    destinationEntityId = "27539626",
-    date = "2025-03-07",
-  } = req.query;
-
-  const options = {
-    method: "GET",
-    url: "https://sky-scrapper.p.rapidapi.com/api/v2/flights/searchFlights",
-    params: {
-      originSkyId,
-      destinationSkyId,
-      originEntityId,
-      destinationEntityId,
-      date,
-      currency: "USD",
-      market: "US",
-      countryCode: "US",
-      cabinClass: "economy",
-      adults: "1",
-      sortBy: "best",
-    },
-    headers: {
-      "x-rapidapi-host": "sky-scrapper.p.rapidapi.com",
-      "x-rapidapi-key": "your-scraper-api-key",
-    },
-  };
-
-  try {
-    const response = await axios.request(options);
-    res.json(response.data);
-  } catch (error) {
-    res.status(500).json({
-      status: false,
-      message: "Backend error: could not fetch flight info",
-      details: error.response?.data || error.message,
-    });
-  }
-});
---------------------------------------------------------------- */
-
-// ✅ Amadeus API setup
+// Initialize Amadeus client
 const amadeus = new Amadeus({
   clientId: process.env.AMADEUS_API_KEY,
   clientSecret: process.env.AMADEUS_API_SECRET,
 });
 
-// ✅ Route to get flight offers from Amadeus
+// Base route
+app.get("/", (req, res) => {
+  res.send("Flight Offer API is live");
+});
+
+// Test Amadeus route
 app.get("/amadeus", async (req, res) => {
   try {
     const response = await amadeus.shopping.flightOffersSearch.get({
@@ -82,7 +45,6 @@ app.get("/amadeus", async (req, res) => {
   }
 });
 
-// Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
