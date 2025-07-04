@@ -1,50 +1,37 @@
-// index.js
 const express = require("express");
 const cors = require("cors");
-const Amadeus = require("amadeus");
 
 const app = express();
 app.use(cors());
 
 const PORT = process.env.PORT || 3000;
 
-// Initialize Amadeus client
-const amadeus = new Amadeus({
-  clientId: process.env.AMADEUS_API_KEY,
-  clientSecret: process.env.AMADEUS_API_SECRET,
+const fakeFlightData = require("./data/flights.json");
+
+app.get("/", (req, res) => {
+  res.send("Flight Offer API is live");
 });
 
-// Root route
-app.get("/amadeus", async (req, res) => {
-  const { origin, destination, departureDate, returnDate, adults, travelClass } = req.query;
+// Simulated route
+app.get("/search", (req, res) => {
+  const { origin, destination, departureDate, returnDate, adults, travelClass, tripType } = req.query;
 
-  if (!origin || !destination || !departureDate || !adults) {
-    return res.status(400).json({ error: "Missing required query parameters" });
-  }
+  const outbound = fakeFlightData.filter(f => f.direction === "outbound");
+  const returning = fakeFlightData.filter(f => f.direction === "return");
 
-  try {
-    const query = {
-      originLocationCode: origin,
-      destinationLocationCode: destination,
-      departureDate,
-      adults,
-      travelClass: travelClass || "ECONOMY",
-      currencyCode: "INR",
-    };
-
-    if (returnDate) {
-      query.returnDate = returnDate;
-    }
-
-    const response = await amadeus.shopping.flightOffersSearch.get(query);
-    res.json(response.data);
-  } catch (error) {
-    console.error("Amadeus API Error:", error);
-    res.status(500).json({ error: "Failed to fetch Amadeus data" });
-  }
+  res.json({
+    outbound,
+    returning: tripType === "round" ? returning : []
+  });
 });
 
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.get("/offers", (req, res) => {
+  const offers = [
+    { portal: "MakeMyTrip", card: "ICICI Credit Card", finalPrice: 5600 },
+    { portal: "EaseMyTrip", card: "HDFC Credit Card", finalPrice: 5400 },
+    { portal: "Goibibo", card: "SBI Credit Card", finalPrice: 5800 }
+  ];
+  res.json(offers);
 });
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
